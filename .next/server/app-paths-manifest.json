@@ -1,0 +1,9 @@
+{
+  "/dashboard/page": "app/dashboard/page.js",
+  "/page": "app/page.js",
+  "/stock/[symbol]/page": "app/stock/[symbol]/page.js",
+  "/upload/page": "app/upload/page.js",
+  "/api/quote/route": "app/api/quote/route.js",
+  "/api/historical/route": "app/api/historical/route.js",
+  "/api/portfolio/route": "app/api/portfolio/route.js"
+}

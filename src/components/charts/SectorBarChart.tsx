@@ -11,7 +11,19 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { SectorAllocation } from "@/types";
-import { formatCurrency } from "@/lib/utils";
+
+const tooltipStyle = {
+  contentStyle: {
+    backgroundColor: "var(--chart-tooltip-bg)",
+    border: "1px solid var(--chart-tooltip-border)",
+    borderRadius: "8px",
+    color: "var(--chart-tooltip-color)",
+    fontSize: 12,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  },
+  itemStyle: { color: "var(--chart-tooltip-color)" },
+  labelStyle: { color: "var(--chart-tooltip-color)", fontWeight: 600 },
+};
 
 export function SectorBarChart({ data }: { data: SectorAllocation[] }) {
   return (
@@ -21,30 +33,26 @@ export function SectorBarChart({ data }: { data: SectorAllocation[] }) {
         layout="vertical"
         margin={{ top: 0, right: 10, left: 0, bottom: 0 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(222 47% 13%)" horizontal={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" horizontal={false} />
         <XAxis
           type="number"
           tickFormatter={(v) => `${v.toFixed(0)}%`}
-          tick={{ fill: "hsl(215 16% 57%)", fontSize: 11 }}
+          tick={{ fill: "var(--chart-axis)", fontSize: 11 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
           type="category"
           dataKey="sector"
-          tick={{ fill: "hsl(215 16% 57%)", fontSize: 11 }}
+          tick={{ fill: "var(--chart-axis)", fontSize: 11 }}
           axisLine={false}
           tickLine={false}
           width={110}
         />
         <Tooltip
-          contentStyle={{
-            backgroundColor: "hsl(222 47% 9%)",
-            border: "1px solid hsl(222 47% 15%)",
-            borderRadius: "8px",
-            color: "hsl(213 31% 91%)",
-            fontSize: 12,
-          }}
+          contentStyle={tooltipStyle.contentStyle}
+          itemStyle={tooltipStyle.itemStyle}
+          labelStyle={tooltipStyle.labelStyle}
           formatter={(value: number) => [`${value.toFixed(1)}%`, "Allocation"]}
         />
         <Bar dataKey="percentage" radius={[0, 4, 4, 0]}>

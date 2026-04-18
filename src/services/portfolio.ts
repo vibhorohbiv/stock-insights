@@ -6,7 +6,7 @@ import {
 } from "@/types";
 import { calcTechnicals, calcVolatility, generatePortfolioInsights } from "@/lib/calculations";
 import { getSectorColor } from "@/lib/utils";
-import { getMultipleQuotes, getHistoricalData } from "./stockApi";
+import { getMultipleQuotes, getHistoricalData } from "./yahooFinance";
 
 const SECTOR_MAP: Record<string, string> = {
   RELIANCE: "Energy",

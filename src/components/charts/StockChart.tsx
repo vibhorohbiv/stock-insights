@@ -28,6 +28,19 @@ interface StockChartProps {
 const PERIODS = ["1mo", "3mo", "6mo", "1y"] as const;
 type Period = (typeof PERIODS)[number];
 
+const tooltipStyle = {
+  contentStyle: {
+    backgroundColor: "var(--chart-tooltip-bg)",
+    border: "1px solid var(--chart-tooltip-border)",
+    borderRadius: "8px",
+    color: "var(--chart-tooltip-color)",
+    fontSize: 12,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  },
+  itemStyle: { color: "var(--chart-tooltip-color)" },
+  labelStyle: { color: "var(--chart-tooltip-color)", fontWeight: 600 },
+};
+
 function computeChartData(data: HistoricalDataPoint[]) {
   const closes = data.map((d) => d.close);
   return data.map((d, i) => ({
@@ -65,7 +78,7 @@ export function StockChart({ data, symbol, sma50, sma200, projectedPrice }: Stoc
               className={cn(
                 "px-3 py-1 rounded-lg text-xs font-medium transition-colors",
                 period === p
-                  ? "bg-primary/20 text-primary"
+                  ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               )}
             >
@@ -76,10 +89,10 @@ export function StockChart({ data, symbol, sma50, sma200, projectedPrice }: Stoc
         <button
           onClick={() => setShowSMA(!showSMA)}
           className={cn(
-            "px-3 py-1 rounded-lg text-xs font-medium transition-colors",
+            "px-3 py-1 rounded-lg text-xs font-medium transition-colors border",
             showSMA
-              ? "bg-amber-500/15 text-amber-400"
-              : "text-muted-foreground hover:bg-secondary"
+              ? "bg-amber-50 text-amber-600 border-amber-200"
+              : "text-muted-foreground hover:bg-secondary border-transparent"
           )}
         >
           SMA Lines
@@ -90,18 +103,18 @@ export function StockChart({ data, symbol, sma50, sma200, projectedPrice }: Stoc
         <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="stockGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={isPositive ? "#10b981" : "#ef4444"} stopOpacity={0.25} />
+              <stop offset="5%" stopColor={isPositive ? "#10b981" : "#ef4444"} stopOpacity={0.2} />
               <stop offset="95%" stopColor={isPositive ? "#10b981" : "#ef4444"} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(222 47% 13%)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
           <XAxis
             dataKey="date"
             tickFormatter={(v) => {
               const d = new Date(v);
               return `${d.toLocaleString("default", { month: "short" })} ${d.getDate()}`;
             }}
-            tick={{ fill: "hsl(215 16% 57%)", fontSize: 10 }}
+            tick={{ fill: "var(--chart-axis)", fontSize: 10 }}
             axisLine={false}
             tickLine={false}
             interval="preserveStartEnd"
@@ -109,19 +122,15 @@ export function StockChart({ data, symbol, sma50, sma200, projectedPrice }: Stoc
           <YAxis
             domain={["auto", "auto"]}
             tickFormatter={(v) => formatCurrency(v, true)}
-            tick={{ fill: "hsl(215 16% 57%)", fontSize: 10 }}
+            tick={{ fill: "var(--chart-axis)", fontSize: 10 }}
             axisLine={false}
             tickLine={false}
             width={70}
           />
           <Tooltip
-            contentStyle={{
-              backgroundColor: "hsl(222 47% 9%)",
-              border: "1px solid hsl(222 47% 15%)",
-              borderRadius: "8px",
-              color: "hsl(213 31% 91%)",
-              fontSize: 12,
-            }}
+            contentStyle={tooltipStyle.contentStyle}
+            itemStyle={tooltipStyle.itemStyle}
+            labelStyle={tooltipStyle.labelStyle}
             formatter={(value: number, name: string) => {
               const labels: Record<string, string> = {
                 close: "Close",
@@ -163,12 +172,12 @@ export function StockChart({ data, symbol, sma50, sma200, projectedPrice }: Stoc
           {projectedPrice && (
             <ReferenceLine
               y={projectedPrice}
-              stroke="#a855f7"
+              stroke="#8b5cf6"
               strokeDasharray="6 3"
               label={{
                 value: `Target: ${formatCurrency(projectedPrice, true)}`,
                 position: "right",
-                fill: "#a855f7",
+                fill: "#8b5cf6",
                 fontSize: 10,
               }}
             />

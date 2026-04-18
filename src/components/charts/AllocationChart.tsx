@@ -15,6 +15,19 @@ interface AllocationChartProps {
   data: SectorAllocation[];
 }
 
+const tooltipStyle = {
+  contentStyle: {
+    backgroundColor: "var(--chart-tooltip-bg)",
+    border: "1px solid var(--chart-tooltip-border)",
+    borderRadius: "8px",
+    color: "var(--chart-tooltip-color)",
+    fontSize: 12,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  },
+  itemStyle: { color: "var(--chart-tooltip-color)" },
+  labelStyle: { color: "var(--chart-tooltip-color)", fontWeight: 600 },
+};
+
 const renderLabel = ({
   cx,
   cy,
@@ -42,8 +55,8 @@ const renderLabel = ({
       fill="white"
       textAnchor="middle"
       dominantBaseline="central"
-      className="text-xs"
       fontSize={11}
+      fontWeight={600}
     >
       {`${(percent * 100).toFixed(0)}%`}
     </text>
@@ -71,18 +84,14 @@ export function AllocationChart({ data }: AllocationChartProps) {
           ))}
         </Pie>
         <Tooltip
-          contentStyle={{
-            backgroundColor: "hsl(222 47% 9%)",
-            border: "1px solid hsl(222 47% 15%)",
-            borderRadius: "8px",
-            color: "hsl(213 31% 91%)",
-            fontSize: 12,
-          }}
+          contentStyle={tooltipStyle.contentStyle}
+          itemStyle={tooltipStyle.itemStyle}
+          labelStyle={tooltipStyle.labelStyle}
           formatter={(value: number) => [formatCurrency(value, true), "Value"]}
         />
         <Legend
           formatter={(value) => (
-            <span style={{ color: "hsl(215 16% 57%)", fontSize: 12 }}>{value}</span>
+            <span style={{ color: "var(--chart-axis)", fontSize: 12 }}>{value}</span>
           )}
         />
       </PieChart>

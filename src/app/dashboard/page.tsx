@@ -113,10 +113,10 @@ export default function DashboardPage() {
         </div>
 
         {isDemo && (
-          <div className="mb-6 flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-400 text-sm">
-            <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+          <div className="mb-6 flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
+            <AlertTriangle className="w-4 h-4 flex-shrink-0 text-amber-500" />
             You&apos;re viewing a demo portfolio.{" "}
-            <Link href="/upload" className="underline underline-offset-2 ml-1">
+            <Link href="/upload" className="underline underline-offset-2 ml-1 font-medium">
               Upload your own portfolio
             </Link>{" "}
             to see real analysis.
@@ -124,7 +124,7 @@ export default function DashboardPage() {
         )}
 
         {isError && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
             Failed to fetch live prices. Showing cached or estimated data.
           </div>
         )}
