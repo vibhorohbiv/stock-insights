@@ -47,11 +47,11 @@ export function isPositive(value: number): boolean {
 }
 
 export function getPnLColor(value: number): string {
-  return value >= 0 ? "text-emerald-600" : "text-red-500";
+  return value >= 0 ? "text-emerald-400" : "text-red-400";
 }
 
 export function getPnLBgColor(value: number): string {
-  return value >= 0 ? "bg-emerald-50" : "bg-red-50";
+  return value >= 0 ? "bg-emerald-500/10" : "bg-red-500/10";
 }
 
 export function normalizeSymbol(symbol: string): string {

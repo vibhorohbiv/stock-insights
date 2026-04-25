@@ -4,7 +4,7 @@ import {
   PortfolioSummary,
   SectorAllocation,
 } from "@/types";
-import { calcTechnicals, calcVolatility, generatePortfolioInsights } from "@/lib/calculations";
+import { calcVolatility, generatePortfolioInsights, calcSignalScore } from "@/lib/calculations";
 import { getSectorColor } from "@/lib/utils";
 import { getMultipleQuotes, getHistoricalData } from "./yahooFinance";
 
@@ -53,18 +53,32 @@ export function getSector(symbol: string): string {
 export async function buildPortfolioSummary(
   rows: ParsedPortfolioRow[]
 ): Promise<PortfolioSummary> {
-  const symbols = [...new Set(rows.map((r) => r.symbol))];
+  const symbols = Array.from(new Set(rows.map((r) => r.symbol)));
 
-  const quotes = await getMultipleQuotes(symbols);
-  const quoteMap = new Map(quotes.map((q) => [q.symbol, q]));
+  const [quotes, historicalResults] = await Promise.all([
+    getMultipleQuotes(symbols),
+    Promise.all(symbols.map((s) => getHistoricalData(s, "3mo").catch(() => []))),
+  ]);
+
+  const quoteMap = new Map<string, (typeof quotes)[number]>();
+  quotes.forEach((q) => { if (q) quoteMap.set(q.symbol, q); });
+
+  const historicalMap = new Map<string, typeof historicalResults[number]>();
+  symbols.forEach((s, i) => historicalMap.set(s, historicalResults[i]));
 
   const holdings: PortfolioHolding[] = rows.map((row) => {
     const quote = quoteMap.get(row.symbol);
+    const hist = historicalMap.get(row.symbol) ?? [];
     const currentPrice = quote?.price ?? row.buyPrice;
     const investedValue = row.quantity * row.buyPrice;
     const currentValue = row.quantity * currentPrice;
     const pnl = currentValue - investedValue;
     const pnlPercent = (pnl / investedValue) * 100;
+
+    const sparkline = hist.slice(-30).map((d) => d.close);
+    const closes = hist.map((d) => d.close);
+    const { signal, score: signalScore, reasons: signalReasons } =
+      closes.length >= 15 ? calcSignalScore(closes) : { signal: "hold" as const, score: 0, reasons: [] };
 
     return {
       symbol: row.symbol,
@@ -80,7 +94,12 @@ export async function buildPortfolioSummary(
       dayChange: quote ? quote.change * row.quantity : 0,
       dayChangePercent: quote?.changePercent ?? 0,
       sector: quote?.sector ?? getSector(row.symbol),
-    };
+      priceSource: quote ? "live" : "buy-price",
+      sparkline,
+      signal,
+      signalScore,
+      signalReasons,
+    } as PortfolioHolding;
   });
 
   // Sort by current value descending
@@ -112,9 +131,7 @@ export async function buildPortfolioSummary(
   // Volatility & risk
   let portfolioVolatility = 0.2;
   try {
-    const firstSymbol = symbols[0];
-    const hist = await getHistoricalData(firstSymbol, "1y");
-    const closes = hist.map((d) => d.close);
+    const closes = (historicalResults[0] ?? []).map((d: { close: number }) => d.close);
     portfolioVolatility = calcVolatility(closes) ?? 0.2;
   } catch {}
 

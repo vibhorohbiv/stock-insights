@@ -13,6 +13,10 @@ export interface PortfolioHolding {
   dayChangePercent?: number;
   sector?: string;
   sparkline?: number[];
+  priceSource?: "live" | "buy-price";
+  signal?: "buy" | "hold" | "caution" | "sell";
+  signalScore?: number;
+  signalReasons?: string[];
 }
 
 export interface ParsedPortfolioRow {

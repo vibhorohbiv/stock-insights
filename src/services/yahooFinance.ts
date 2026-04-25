@@ -1,6 +1,42 @@
 import { cache, TTL } from "@/services/cache";
 import { HistoricalDataPoint, StockQuote } from "@/types";
 
+// Maps broker/portfolio shorthand symbols → actual NSE symbols used by Yahoo Finance
+const NSE_SYMBOL_MAP: Record<string, string> = {
+  NRBBEA:  "NRBBEARINGS",
+  ASHLEY:  "ASHOKLEY",
+  HYUMOT:  "HYUNDAI",
+  TVSMOT:  "TVSMOTOR",
+  BANBAR:  "BANKBARODA",
+  ICIBAN:  "ICICIBANK",
+  BHAFOR:  "BHARATFORG",
+  JKLAKS:  "JKLAKSHMI",
+  RALIND:  "RALLIS",
+  TATCHE:  "TATACHEM",
+  SOBDEV:  "SOBHA",
+  CROGR:   "CROMPTON",
+  ZOMLIM:  "ZOMATO",
+  CUMIND:  "CUMMINSIND",
+  FAGBEA:  "SCHAEFFLER",
+  SIEMEN:  "SIEMENS",
+  SKFIND:  "SKFINDIA",
+  TIMIND:  "TIMKEN",
+  ADIAMC:  "ABSLAMC",
+  BAJFI:   "BAJFINANCE",
+  INFTEC:  "INFY",
+  SONSOF:  "SONATSOFTW",
+  TATTEC:  "TATATECH",
+  LARTOU:  "LT",
+  HINCOP:  "HINDCOPPER",
+  HINZIN:  "HINDZINC",
+  JUBFOO:  "JUBLFOOD",
+  BHAPET:  "BPCL",
+  APOTYR:  "APOLLOTYRE",
+  MRFTYR:  "MRF",
+  SIEENE:  "SIEMENSENE",
+  LIC:     "LICI",
+};
+
 const SECTOR_MAP: Record<string, string> = {
   RELIANCE: "Energy",
   TCS: "Information Technology",
@@ -76,43 +112,27 @@ async function fetchYahooQuote(symbol: string): Promise<StockQuote> {
   };
 }
 
-function mockQuote(symbol: string): StockQuote {
-  const basePrice = 500 + Math.abs(symbol.charCodeAt(0) * 37 + (symbol.charCodeAt(1) ?? 0) * 13) % 4500;
-  const change = (Math.random() - 0.48) * basePrice * 0.03;
-  return {
-    symbol,
-    name: symbol,
-    price: parseFloat(basePrice.toFixed(2)),
-    change: parseFloat(change.toFixed(2)),
-    changePercent: parseFloat(((change / basePrice) * 100).toFixed(2)),
-    open: parseFloat((basePrice * 0.99).toFixed(2)),
-    high: parseFloat((basePrice * 1.015).toFixed(2)),
-    low: parseFloat((basePrice * 0.985).toFixed(2)),
-    volume: Math.floor(Math.random() * 5_000_000) + 500_000,
-    week52High: parseFloat((basePrice * 1.3).toFixed(2)),
-    week52Low: parseFloat((basePrice * 0.7).toFixed(2)),
-    sector: SECTOR_MAP[symbol] ?? "Others",
-    timestamp: new Date().toISOString(),
-  };
-}
-
-export async function getQuote(symbol: string): Promise<StockQuote> {
+export async function getQuote(symbol: string): Promise<StockQuote | null> {
   const cacheKey = `quote:${symbol}`;
   const cached = cache.get<StockQuote>(cacheKey);
   if (cached) return cached;
 
-  let quote: StockQuote;
-  try {
-    quote = await fetchYahooQuote(symbol);
-  } catch {
-    quote = mockQuote(symbol);
-  }
+  // Resolve broker shorthand → actual NSE symbol
+  const nseSymbol = NSE_SYMBOL_MAP[symbol.toUpperCase()] ?? symbol;
 
-  cache.set(cacheKey, quote, TTL.QUOTE);
-  return quote;
+  try {
+    const raw = await fetchYahooQuote(nseSymbol);
+    // Preserve the original portfolio symbol so the quote map key matches
+    const quote: StockQuote = { ...raw, symbol };
+    cache.set(cacheKey, quote, TTL.QUOTE);
+    return quote;
+  } catch {
+    // Return null so the portfolio service falls back to buy price
+    return null;
+  }
 }
 
-export async function getMultipleQuotes(symbols: string[]): Promise<StockQuote[]> {
+export async function getMultipleQuotes(symbols: string[]): Promise<(StockQuote | null)[]> {
   return Promise.all(symbols.map(getQuote));
 }
 

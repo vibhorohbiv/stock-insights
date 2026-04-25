@@ -10,10 +10,11 @@ export async function GET(req: NextRequest) {
     if (symbols) {
       const syms = symbols.split(",").map((s) => s.trim().toUpperCase()).filter(Boolean);
       const quotes = await getMultipleQuotes(syms);
-      return NextResponse.json(quotes);
+      return NextResponse.json(quotes.filter(Boolean));
     }
     if (symbol) {
       const quote = await getQuote(symbol.trim().toUpperCase());
+      if (!quote) return NextResponse.json({ error: `No data for ${symbol}` }, { status: 404 });
       return NextResponse.json(quote);
     }
     return NextResponse.json({ error: "symbol or symbols required" }, { status: 400 });

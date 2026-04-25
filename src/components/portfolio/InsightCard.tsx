@@ -5,27 +5,27 @@ import { cn } from "@/lib/utils";
 const CONFIG = {
   warning: {
     icon: AlertTriangle,
-    bg: "bg-amber-50 border-amber-200",
-    iconColor: "text-amber-500",
-    textColor: "text-amber-800",
+    bg: "bg-amber-500/10 border-amber-500/25",
+    iconColor: "text-amber-400",
+    textColor: "text-amber-300",
   },
   info: {
     icon: Info,
-    bg: "bg-blue-50 border-blue-200",
-    iconColor: "text-blue-500",
-    textColor: "text-blue-800",
+    bg: "bg-blue-500/10 border-blue-500/25",
+    iconColor: "text-blue-400",
+    textColor: "text-blue-300",
   },
   success: {
     icon: CheckCircle,
-    bg: "bg-emerald-50 border-emerald-200",
-    iconColor: "text-emerald-500",
-    textColor: "text-emerald-800",
+    bg: "bg-emerald-500/10 border-emerald-500/25",
+    iconColor: "text-emerald-400",
+    textColor: "text-emerald-300",
   },
   danger: {
     icon: XCircle,
-    bg: "bg-red-50 border-red-200",
-    iconColor: "text-red-500",
-    textColor: "text-red-800",
+    bg: "bg-red-500/10 border-red-500/25",
+    iconColor: "text-red-400",
+    textColor: "text-red-300",
   },
 };
 

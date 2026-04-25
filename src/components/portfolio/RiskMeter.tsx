@@ -17,10 +17,10 @@ export function RiskMeter({ score, level }: RiskMeterProps) {
 
   const textColor =
     level === "Low"
-      ? "text-emerald-600"
+      ? "text-emerald-400"
       : level === "Medium"
-      ? "text-amber-600"
-      : "text-red-500";
+      ? "text-amber-400"
+      : "text-red-400";
 
   return (
     <div className="space-y-2">
